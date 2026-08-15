@@ -1,0 +1,211 @@
+"use client";
+import React, { useEffect, useState, Suspense } from 'react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import axios from 'axios';
+import ProductCard from '@/components/ProductCard/ProductCard';
+import Skeleton from '@/components/Skeleton/Skeleton';
+import { FiSearch } from 'react-icons/fi';
+
+const categoriesList = ['Electronics', 'Furniture', 'Vehicles', 'Fashion', 'Mobile Phones', 'Books', 'Sports', 'Home & Garden'];
+const conditionsList = ['excellent', 'good', 'fair'];
+
+const AllProducts = () => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  
+  const [search, setSearch] = useState(searchParams.get('search') || '');
+  const [category, setCategory] = useState(searchParams.get('category') || '');
+  const [condition, setCondition] = useState(searchParams.get('condition') || '');
+  const [sort, setSort] = useState(searchParams.get('sort') || '');
+  const [page, setPage] = useState(parseInt(searchParams.get('page') || '1'));
+  
+  const [products, setProducts] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setSearch(searchParams.get('search') || '');
+    setCategory(searchParams.get('category') || '');
+    setCondition(searchParams.get('condition') || '');
+    setSort(searchParams.get('sort') || '');
+    setPage(parseInt(searchParams.get('page') || '1'));
+  }, [searchParams]);
+
+  useEffect(() => {
+    setLoading(true);
+    const queryParams = new URLSearchParams();
+    if (search) queryParams.set('search', search);
+    if (category) queryParams.set('category', category);
+    if (condition) queryParams.set('condition', condition);
+    if (sort) queryParams.set('sort', sort);
+    queryParams.set('page', page.toString());
+    queryParams.set('limit', '6');
+
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    axios.get(`${apiBase}/products?${queryParams.toString()}`)
+      .then(res => {
+        if (res.data?.success) {
+          setProducts(res.data.products);
+          setTotal(res.data.total);
+          setTotalPages(res.data.totalPages);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error loading products", err);
+        setLoading(false);
+      });
+  }, [search, category, condition, sort, page]);
+
+  const updateQuery = (key, value) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) {
+      params.set(key, value);
+    } else {
+      params.delete(key);
+    }
+    if (key !== 'page') {
+      params.set('page', '1');
+    }
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    updateQuery('search', search);
+  };
+
+  const clearFilters = () => {
+    router.push(pathname);
+    setSearch('');
+    setCategory('');
+    setCondition('');
+    setSort('');
+  };
+
+  return (
+    <div className="min-h-screen bg-base-100 py-12 px-6">
+      <div className="max-w-6xl mx-auto space-y-8">
+        
+        <div className="space-y-2">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-blue-500">
+            Marketplace <span className="text-base-content">Deals</span>
+          </h1>
+          <p className="text-slate-400 text-sm">Find, compare and grab certified pre-owned items locally.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 bg-base-200 border border-base-300 p-6 rounded-3xl shadow-lg">
+          <form onSubmit={handleSearchSubmit} className="relative md:col-span-2">
+            <FiSearch className="absolute top-1/2 left-4 -translate-y-1/2 text-slate-500" />
+            <input
+              type="text"
+              placeholder="Search by keyword..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="input input-bordered w-full pl-12 bg-base-100 text-base-content"
+            />
+          </form>
+
+          <div className="form-control">
+            <select
+              value={category}
+              onChange={(e) => updateQuery('category', e.target.value)}
+              className="select select-bordered bg-base-100 text-base-content font-semibold"
+            >
+              <option value="">All Categories</option>
+              {categoriesList.map(cat => (
+                <option key={cat} value={cat.toLowerCase()}>{cat}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-control">
+            <select
+              value={sort}
+              onChange={(e) => updateQuery('sort', e.target.value)}
+              className="select select-bordered bg-base-100 text-base-content font-semibold"
+            >
+              <option value="">Sort: Newest</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="oldest">Date: Oldest</option>
+            </select>
+          </div>
+
+          <div className="form-control">
+            <select
+              value={condition}
+              onChange={(e) => updateQuery('condition', e.target.value)}
+              className="select select-bordered bg-base-100 text-base-content font-semibold"
+            >
+              <option value="">Condition: Any</option>
+              {conditionsList.map(cond => (
+                <option key={cond} value={cond} className="capitalize">{cond}</option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            onClick={clearFilters}
+            className="btn btn-outline btn-ghost border-base-300 hover:bg-base-300 text-base-content"
+          >
+            Clear Filters
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[...Array(6)].map((_, idx) => (
+              <Skeleton key={idx} />
+            ))}
+          </div>
+        ) : products.length === 0 ? (
+          <div className="text-center py-20 bg-base-200 border border-base-300 rounded-3xl space-y-4">
+            <p className="text-slate-400">No listings found matching the criteria.</p>
+            <button onClick={clearFilters} className="btn btn-primary btn-sm text-white">Reset Search</button>
+          </div>
+        ) : (
+          <div className="space-y-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {products.map(product => (
+                <ProductCard key={product._id} product={product} />
+              ))}
+            </div>
+
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-4 pt-6">
+                <button
+                  onClick={() => updateQuery('page', (page - 1).toString())}
+                  disabled={page === 1}
+                  className="btn btn-outline btn-sm"
+                >
+                  Previous
+                </button>
+                <span className="text-sm font-semibold text-base-content/70">
+                  Page {page} of {totalPages}
+                </span>
+                <button
+                  onClick={() => updateQuery('page', (page + 1).toString())}
+                  disabled={page === totalPages}
+                  className="btn btn-outline btn-sm"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default function AllProductsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading marketplace...</div>}>
+      <AllProducts />
+    </Suspense>
+  );
+}
