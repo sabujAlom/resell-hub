@@ -29,7 +29,7 @@ const About = () => {
           <div className="p-8 rounded-3xl bg-base-100 border border-base-300 shadow-md space-y-4">
             <h3 className="text-xl font-bold text-green-500">Our Mission</h3>
             <p className="text-base-content/70 text-sm leading-relaxed">
-              To build a secure peer-to-peer marketplace that empowers buyers to save money on quality items, and sellers to clean out their closets with absolute peace of mind.
+              To create a trusted peer-to-peer marketplace where buyers discover great deals on quality products and sellers can sell with confidence, simplicity, and peace of mind .
             </p>
           </div>
         </div>
