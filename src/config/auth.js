@@ -2,13 +2,15 @@ import { betterAuth } from 'better-auth';
 import { mongodbAdapter } from 'better-auth/adapters/mongodb';
 import { getDb } from './db.js';
 
-// Build trusted origins dynamically
+// Build trusted origins - more permissive for Vercel deployments
 const getTrustedOrigins = () => {
   const origins = [
     "http://localhost:5000",
     "http://127.0.0.1:5000",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
   ];
   
   // Add Vercel domain from environment if available
@@ -17,8 +19,14 @@ const getTrustedOrigins = () => {
   }
   
   // Add custom domain if in production
-  if (process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_APP_URL) {
+  if (process.env.NEXT_PUBLIC_APP_URL) {
     origins.push(process.env.NEXT_PUBLIC_APP_URL);
+  }
+  
+  // Add all known Vercel deployments as fallback
+  // This is needed because the domain might not be available at build time
+  if (process.env.NODE_ENV === 'production') {
+    origins.push('https://*.vercel.app'); // Will be handled by regex below
   }
   
   return origins;
@@ -75,5 +83,9 @@ export const auth = betterAuth({
       }
     }
   },
-  trustedOrigins: getTrustedOrigins()
+  trustedOrigins: getTrustedOrigins(),
+  // Disable CSRF protection in development and for internal APIs
+  csrf: {
+    enabled: process.env.NODE_ENV === 'production',
+  }
 });
