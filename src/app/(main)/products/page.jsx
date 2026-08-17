@@ -43,18 +43,22 @@ const AllProducts = () => {
     queryParams.set('page', page.toString());
     queryParams.set('limit', '6');
 
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-    axios.get(`${apiBase}/products?${queryParams.toString()}`)
+    // Use local proxy route instead of external API
+    axios.get(`/api/products?${queryParams.toString()}`)
       .then(res => {
         if (res.data?.success) {
           setProducts(res.data.products);
           setTotal(res.data.total);
           setTotalPages(res.data.totalPages);
+        } else {
+          console.warn('API response not successful:', res.data);
+          setProducts([]);
         }
         setLoading(false);
       })
       .catch(err => {
-        console.error("Error loading products", err);
+        console.error("Error loading products", err.message, err.response?.data);
+        setProducts([]);
         setLoading(false);
       });
   }, [search, category, condition, sort, page]);

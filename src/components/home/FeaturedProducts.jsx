@@ -18,14 +18,17 @@ const FeaturedProducts = () => {
     setWishlistedIds(saved.map(item => item._id));
 
     // Fetch real products from API
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/products?limit=4&sort=newest`)
+    fetch(`/api/products?limit=4&sort=newest`)
       .then(res => res.json())
       .then(data => {
         const items = Array.isArray(data) ? data : data.products || [];
         setProducts(items.slice(0, 4));
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(err => {
+        console.error("Error loading featured products:", err);
+        setLoading(false);
+      });
   }, []);
 
   const handleWishlist = (e, product) => {

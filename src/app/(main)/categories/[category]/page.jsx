@@ -25,9 +25,8 @@ const CategoryProducts = ({ params: paramsPromise }) => {
 
   useEffect(() => {
     setLoading(true);
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
     
-    axios.get(`${apiBase}/products?category=${queryCategory}`)
+    axios.get(`/api/products?category=${queryCategory}`)
       .then(res => {
         if (res.data?.success) {
           setProducts(res.data.products);
@@ -36,6 +35,7 @@ const CategoryProducts = ({ params: paramsPromise }) => {
       })
       .catch(err => {
         console.error("Error loading products by category", err);
+        setProducts([]);
         setLoading(false);
       });
   }, [rawCategory]);

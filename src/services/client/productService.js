@@ -1,15 +1,13 @@
 import axios from 'axios';
 import { axiosSecure } from '../../hooks/useAxiosSecure';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-
 export const getProducts = async (params) => {
-  const res = await axios.get(`${BASE_URL}/products`, { params });
+  const res = await axios.get(`/api/products`, { params });
   return res.data;
 };
 
 export const getProductById = async (id) => {
-  const res = await axios.get(`${BASE_URL}/products/${id}`);
+  const res = await axios.get(`/api/products/${id}`);
   return res.data;
 };
 

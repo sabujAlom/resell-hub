@@ -25,22 +25,21 @@ const ProductDetails = () => {
   const [activeOrder, setActiveOrder] = useState(null);
 
   useEffect(() => {
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-    axios.get(`${apiBase}/products/${id}`)
+    axios.get(`/api/products/${id}`)
       .then(res => {
         setProduct(res.data);
         setLoading(false);
       })
       .catch(err => {
-        console.error(err);
+        console.error("Error loading product details:", err);
         setLoading(false);
       });
 
-    axios.get(`${apiBase}/reviews?productId=${id}`)
+    axios.get(`/api/reviews?productId=${id}`)
       .then(res => {
         setReviews(res.data);
       })
-      .catch(err => console.error(err));
+      .catch(err => console.error("Error loading reviews:", err));
   }, [id]);
 
   const handleBooking = async () => {

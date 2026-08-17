@@ -19,7 +19,7 @@ const AuthProvider = ({ children }) => {
         setUser(sessionData.user);
         
         // Fetch JWT token for custom routes
-        axios.post(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/jwt`, {}, {
+        axios.post(`/api/proxy/jwt`, {}, {
           withCredentials: true
         })
         .then(data => {
