@@ -2,6 +2,28 @@ import { betterAuth } from 'better-auth';
 import { mongodbAdapter } from 'better-auth/adapters/mongodb';
 import { getDb } from './db.js';
 
+// Build trusted origins dynamically
+const getTrustedOrigins = () => {
+  const origins = [
+    "http://localhost:5000",
+    "http://127.0.0.1:5000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+  ];
+  
+  // Add Vercel domain from environment if available
+  if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+    origins.push(`https://${process.env.NEXT_PUBLIC_VERCEL_URL}`);
+  }
+  
+  // Add custom domain if in production
+  if (process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_APP_URL) {
+    origins.push(process.env.NEXT_PUBLIC_APP_URL);
+  }
+  
+  return origins;
+};
+
 export const auth = betterAuth({
   database: mongodbAdapter(getDb(), {
     collectionNames: {
@@ -53,10 +75,5 @@ export const auth = betterAuth({
       }
     }
   },
-  trustedOrigins: [
-    "http://localhost:5000",
-    "http://127.0.0.1:5000",
-    "http://localhost:5173",
-    "http://127.0.0.1:5173"
-  ]
+  trustedOrigins: getTrustedOrigins()
 });
