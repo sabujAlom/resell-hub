@@ -22,7 +22,7 @@ const CallToAction = () => {
               Ready to Start Buying or Selling?
             </h2>
             <p className="text-blue-100 text-lg md:text-xl mb-10 max-w-2xl mx-auto">
-              Join over 15+ thousand users who trust ReSellHub for the best second-hand marketplace experience.
+              Join over 19+ thousand users who trust ReSellHub for the best second-hand marketplace experience.
             </p>
             
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
