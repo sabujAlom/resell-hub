@@ -61,15 +61,9 @@ const Navbar = () => {
       </li>
       <li>
         <Link 
-          href="/#categories" 
-          className="font-semibold text-base-content/80 hover:text-base-content"
-          onClick={(e) => {
-            if (pathname === '/') {
-              e.preventDefault();
-              document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' });
-            }
-            setIsOpen(false);
-          }}
+          href="/categories"
+          className={`font-semibold ${pathname.startsWith('/categories') ? 'text-blue-500' : 'text-base-content/80 hover:text-base-content'}`}
+          onClick={() => setIsOpen(false)}
         >
           Categories
         </Link>
