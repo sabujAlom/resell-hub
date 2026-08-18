@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import useAuth from './useAuth';
 import { useEffect } from 'react';
+import { authClient } from '@/lib/auth-client';
 
 export const axiosSecure = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
@@ -11,10 +12,12 @@ export const axiosSecure = axios.create({
 
 // Static Request Interceptor
 axiosSecure.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('access-token');
-    if (token) {
-      config.headers.authorization = `Bearer ${token}`;
+  async (config) => {
+    // Better Auth creates the JWT from the signed-in user's session.
+    const { data } = await authClient.token();
+
+    if (data?.token) {
+      config.headers.Authorization = `Bearer ${data.token}`;
     }
     return config;
   },

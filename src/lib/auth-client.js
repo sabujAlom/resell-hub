@@ -17,13 +17,11 @@ if (typeof window !== 'undefined') {
     authClient = createAuthClient({
       // Better Auth is served by this Next.js application at /api/auth.
       baseURL: window.location.origin,
-      plugins:[
-        jwtClient()
-      ],
       fetchOptions: {
         credentials: 'include',
       },
       plugins: [
+        jwtClient(),
         inferAdditionalFields({
           user: {
             role: { type: "string" },

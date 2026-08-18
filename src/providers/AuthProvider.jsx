@@ -2,7 +2,6 @@
 import { createContext, useEffect, useState } from 'react';
 import { authClient } from '../lib/auth-client';
 import { registerUser, loginUser, loginWithGoogle, logoutUser, updateProfile } from '../services/client/authService';
-import apiClient from '@/lib/api-client';
 
 export const AuthContext = createContext(null);
 
@@ -17,24 +16,9 @@ const AuthProvider = ({ children }) => {
     if (!isPending) {
       if (sessionData?.user) {
         setUser(sessionData.user);
-        
-        // Fetch JWT token for custom routes
-        apiClient.post('/jwt', {}, {
-          withCredentials: true
-        })
-        .then(data => {
-          if (data.data?.token) {
-            localStorage.setItem('access-token', data.data.token);
-          }
-          setLoading(false);
-        })
-        .catch(err => {
-          console.error("JWT retrieval error", err);
-          setLoading(false);
-        });
+        setLoading(false);
       } else {
         setUser(null);
-        localStorage.removeItem('access-token');
         setLoading(false);
       }
     }
@@ -81,7 +65,6 @@ const AuthProvider = ({ children }) => {
     try {
       const response = await logoutUser();
       setUser(null);
-      localStorage.removeItem('access-token');
       setLoading(false);
       return response;
     } catch (err) {
