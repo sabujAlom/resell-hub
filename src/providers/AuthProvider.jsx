@@ -2,7 +2,7 @@
 import { createContext, useEffect, useState } from 'react';
 import { authClient } from '../lib/auth-client';
 import { registerUser, loginUser, loginWithGoogle, logoutUser, updateProfile } from '../services/client/authService';
-import axios from 'axios';
+import apiClient from '@/lib/api-client';
 
 export const AuthContext = createContext(null);
 
@@ -19,7 +19,7 @@ const AuthProvider = ({ children }) => {
         setUser(sessionData.user);
         
         // Fetch JWT token for custom routes
-        axios.post(`/api/proxy/jwt`, {}, {
+        apiClient.post('/jwt', {}, {
           withCredentials: true
         })
         .then(data => {

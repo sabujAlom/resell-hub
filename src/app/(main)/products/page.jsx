@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import axios from 'axios';
+import apiClient from '@/lib/api-client';
 import ProductCard from '@/components/ProductCard/ProductCard';
 import Skeleton from '@/components/Skeleton/Skeleton';
 import { FiSearch } from 'react-icons/fi';
@@ -44,7 +44,7 @@ const AllProducts = () => {
     queryParams.set('limit', '6');
 
     // Use local proxy route instead of external API
-    axios.get(`/api/products?${queryParams.toString()}`)
+    apiClient.get(`/products?${queryParams.toString()}`)
       .then(res => {
         if (res.data?.success) {
           setProducts(res.data.products);

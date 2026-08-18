@@ -1,13 +1,13 @@
-import axios from 'axios';
+import apiClient from '../../lib/api-client';
 import { axiosSecure } from '../../hooks/useAxiosSecure';
 
 export const getProducts = async (params) => {
-  const res = await axios.get(`/api/products`, { params });
+  const res = await apiClient.get('/products', { params });
   return res.data;
 };
 
 export const getProductById = async (id) => {
-  const res = await axios.get(`/api/products/${id}`);
+  const res = await apiClient.get(`/products/${id}`);
   return res.data;
 };
 

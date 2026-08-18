@@ -15,7 +15,7 @@ let authClient = null;
 if (typeof window !== 'undefined') {
   try {
     authClient = createAuthClient({
-      baseURL: window.location.origin + '/api/auth',
+      baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL || 'http://localhost:5000',
       fetchOptions: {
         credentials: 'include',
       },

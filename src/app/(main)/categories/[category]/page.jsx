@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState, use } from 'react';
-import axios from 'axios';
+import apiClient from '@/lib/api-client';
 import ProductCard from '@/components/ProductCard/ProductCard';
 import Skeleton from '@/components/Skeleton/Skeleton';
 import Link from 'next/link';
@@ -26,7 +26,7 @@ const CategoryProducts = ({ params: paramsPromise }) => {
   useEffect(() => {
     setLoading(true);
     
-    axios.get(`/api/products?category=${queryCategory}`)
+    apiClient.get(`/products?category=${queryCategory}`)
       .then(res => {
         if (res.data?.success) {
           setProducts(res.data.products);

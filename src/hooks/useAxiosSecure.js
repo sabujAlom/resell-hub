@@ -5,7 +5,7 @@ import useAuth from './useAuth';
 import { useEffect } from 'react';
 
 export const axiosSecure = axios.create({
-  baseURL: '/api/proxy',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
   withCredentials: true
 });
 

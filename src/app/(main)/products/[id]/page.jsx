@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import axios from 'axios';
+import apiClient from '@/lib/api-client';
 import useAuth from '@/hooks/useAuth';
 import useAxiosSecure from '@/hooks/useAxiosSecure';
 import { toast } from 'react-hot-toast';
@@ -25,7 +25,7 @@ const ProductDetails = () => {
   const [activeOrder, setActiveOrder] = useState(null);
 
   useEffect(() => {
-    axios.get(`/api/products/${id}`)
+    apiClient.get(`/products/${id}`)
       .then(res => {
         setProduct(res.data);
         setLoading(false);
@@ -35,7 +35,7 @@ const ProductDetails = () => {
         setLoading(false);
       });
 
-    axios.get(`/api/reviews?productId=${id}`)
+    apiClient.get(`/reviews?productId=${id}`)
       .then(res => {
         setReviews(res.data);
       })

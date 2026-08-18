@@ -18,7 +18,7 @@ const FeaturedProducts = () => {
     setWishlistedIds(saved.map(item => item._id));
 
     // Fetch real products from API
-    fetch(`/api/products?limit=4&sort=newest`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/products?limit=4&sort=newest`, { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         const items = Array.isArray(data) ? data : data.products || [];
