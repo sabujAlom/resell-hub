@@ -15,7 +15,8 @@ let authClient = null;
 if (typeof window !== 'undefined') {
   try {
     authClient = createAuthClient({
-      baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL || 'http://localhost:5000',
+      // Better Auth is served by this Next.js application at /api/auth.
+      baseURL: window.location.origin,
       fetchOptions: {
         credentials: 'include',
       },
