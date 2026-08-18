@@ -1,5 +1,5 @@
 import { createAuthClient } from "better-auth/react";
-import { inferAdditionalFields } from "better-auth/client/plugins";
+import { inferAdditionalFields, jwtClient } from "better-auth/client/plugins";
 
 // Create dummy client for server-side rendering
 const createDummyClient = () => ({
@@ -17,6 +17,9 @@ if (typeof window !== 'undefined') {
     authClient = createAuthClient({
       // Better Auth is served by this Next.js application at /api/auth.
       baseURL: window.location.origin,
+      plugins:[
+        jwtClient()
+      ],
       fetchOptions: {
         credentials: 'include',
       },
