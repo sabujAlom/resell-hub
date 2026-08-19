@@ -24,20 +24,20 @@ const CategoryProducts = ({ params: paramsPromise }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
-    
-    apiClient.get(`/products?category=${queryCategory}`)
-      .then(res => {
+    const fetchData = async () => {
+      try {
+        const res = await apiClient.get(`/products?category=${queryCategory}`);
         if (res.data?.success) {
           setProducts(res.data.products);
         }
-        setLoading(false);
-      })
-      .catch(err => {
+      } catch (err) {
         console.error("Error loading products by category", err);
         setProducts([]);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+    fetchData();
   }, [rawCategory]);
 
   return (

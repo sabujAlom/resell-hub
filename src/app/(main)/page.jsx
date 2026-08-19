@@ -6,6 +6,7 @@ import Statistics from '@/components/home/Statistics';
 import SuccessStories from '@/components/home/SuccessStories';
 import Sustainability from '@/components/home/Sustainability';
 import TrustedSellers from '@/components/home/TrustedSellers';
+import RecentlyViewed from '@/components/home/RecentlyViewed';
 import CallToAction from '@/components/home/CallToAction';
 
 const Home = () => {
@@ -18,6 +19,7 @@ const Home = () => {
       <SuccessStories />
       <Sustainability />
       <TrustedSellers />
+      <RecentlyViewed />
       <CallToAction />
     </div>
   );

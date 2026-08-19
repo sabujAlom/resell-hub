@@ -25,22 +25,47 @@ const ProductDetails = () => {
   const [activeOrder, setActiveOrder] = useState(null);
 
   useEffect(() => {
-    apiClient.get(`/products/${id}`)
-      .then(res => {
+    const loadData = async () => {
+      try {
+        const res = await apiClient.get(`/products/${id}`);
         setProduct(res.data);
-        setLoading(false);
-      })
-      .catch(err => {
+      } catch (err) {
         console.error("Error loading product details:", err);
+      } finally {
         setLoading(false);
-      });
+      }
 
-    apiClient.get(`/reviews?productId=${id}`)
-      .then(res => {
-        setReviews(res.data);
-      })
-      .catch(err => console.error("Error loading reviews:", err));
+      try {
+        const rev = await apiClient.get(`/reviews?productId=${id}`);
+        setReviews(rev.data);
+      } catch (err) {
+        console.error("Error loading reviews:", err);
+      }
+    };
+    loadData();
   }, [id]);
+
+  useEffect(() => {
+    if (!product) return;
+    try {
+      const stored = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+      const next = [
+        {
+          _id: product._id,
+          title: product.title,
+          price: product.price,
+          category: product.category,
+          condition: product.condition,
+          images: product.images,
+          sellerInfo: product.sellerInfo,
+        },
+        ...stored.filter(item => item._id !== product._id),
+      ].slice(0, 8);
+      localStorage.setItem('recentlyViewed', JSON.stringify(next));
+    } catch (err) {
+      console.error(err);
+    }
+  }, [product]);
 
   const handleBooking = async () => {
     if (!user) {
@@ -62,18 +87,7 @@ const ProductDetails = () => {
 
       if (orderRes.data?.success) {
         const order = orderRes.data.order;
-        toast.loading("Redirecting to Stripe Checkout...", { id: "checkout-redirect" });
-        const sessionRes = await axiosSecure.post('/payments/create-checkout-session', {
-          productId: product._id,
-          buyerId: user.id || user._id,
-          orderId: order._id
-        });
-        if (sessionRes.data?.success && sessionRes.data?.url) {
-          toast.dismiss("checkout-redirect");
-          window.location.href = sessionRes.data.url;
-        } else {
-          toast.error(sessionRes.data?.message || "Failed to generate checkout page.", { id: "checkout-redirect" });
-        }
+        router.push(`/checkout?orderId=${order._id}&productId=${product._id}`);
       }
     } catch (err) {
       console.error(err);

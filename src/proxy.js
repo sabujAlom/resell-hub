@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 
-// Protect every dashboard page before it is rendered.
+// Guard every dashboard route before it is rendered.
+// Proxy always runs on the Node.js runtime, which Better Auth's
+// MongoDB adapter requires.
 export async function proxy(request) {
   const session = await auth.api.getSession({
     headers: request.headers,

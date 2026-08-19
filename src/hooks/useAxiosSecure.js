@@ -13,11 +13,16 @@ export const axiosSecure = axios.create({
 // Static Request Interceptor
 axiosSecure.interceptors.request.use(
   async (config) => {
-    // Better Auth creates the JWT from the signed-in user's session.
-    const { data } = await authClient.token();
-
-    if (data?.token) {
-      config.headers.Authorization = `Bearer ${data.token}`;
+    // Better Auth issues a JWT for the signed-in user's session via /api/auth/token.
+    // The client returns the body directly: { token: "..." } (handle both shapes just in case).
+    try {
+      const res = await authClient.token();
+      const token = res?.token ?? res?.data?.token;
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch {
+      // No active session; let the request proceed so the server can return 401 if required.
     }
     return config;
   },

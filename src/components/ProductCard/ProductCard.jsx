@@ -1,12 +1,14 @@
 'use client';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { FiCheckCircle, FiHeart } from 'react-icons/fi';
+import { FiCheckCircle, FiHeart, FiColumns } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import useAuth from '@/hooks/useAuth';
+import { useCompare } from '@/context/CompareContext';
 
 const ProductCard = ({ product }) => {
   const { user } = useAuth();
+  const { isCompared, toggle: toggleCompare } = useCompare();
   const [isWishlisted, setIsWishlisted] = useState(false);
 
   useEffect(() => {
@@ -52,6 +54,13 @@ const ProductCard = ({ product }) => {
           className={`absolute top-4 right-4 bg-base-100/80 backdrop-blur-sm p-2 rounded-full cursor-pointer transition-all hover:scale-110 ${isWishlisted ? 'text-red-500 bg-red-50' : 'text-base-content/60 hover:text-red-400 hover:bg-red-500/10'}`}
         >
           <FiHeart className={`h-5 w-5 transition-all ${isWishlisted ? 'fill-red-500' : ''}`} />
+        </button>
+        <button
+          onClick={() => toggleCompare(product)}
+          title={isCompared(product._id) ? 'Remove from comparison' : 'Compare product'}
+          className={`absolute top-4 right-16 bg-base-100/80 backdrop-blur-sm p-2 rounded-full cursor-pointer transition-all hover:scale-110 ${isCompared(product._id) ? 'text-primary bg-primary/10' : 'text-base-content/60 hover:text-primary hover:bg-primary/10'}`}
+        >
+          <FiColumns className="h-5 w-5" />
         </button>
       </figure>
 

@@ -11,13 +11,15 @@ if (!databaseUri) {
 
 const client = new MongoClient(databaseUri);
 const database = client.db();
-// This Better Auth server is hosted by the local Next.js app.
-const baseURL = 'http://localhost:5173';
+// This Better Auth server is hosted by this Next.js app.
+// Use the deployed client URL in production; default to the local dev origin.
+const baseURL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:5173';
 
 export const auth = betterAuth({
   baseURL,
-  secret: process.env.BETTER_AUTH_SECRET,
-  trustedOrigins: [baseURL],
+  // Must match the JWT_SECRET the external REST API uses to verify tokens.
+  secret: process.env.BETTER_AUTH_SECRET || process.env.JWT_SECRET,
+  trustedOrigins: [baseURL, 'http://localhost:5173'],
   database: mongodbAdapter(database, { client }),
   emailAndPassword: {
     enabled: true,
@@ -41,7 +43,7 @@ export const auth = betterAuth({
   user: {
     additionalFields: {
       role: {
-        type: ['buyer', 'seller'],
+        type: ['buyer', 'seller', 'admin'],
         required: false,
         defaultValue: 'buyer',
       },
