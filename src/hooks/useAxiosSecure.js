@@ -16,11 +16,12 @@ axiosSecure.interceptors.request.use(
     // Better Auth issues a JWT for the signed-in user's session via /api/auth/token.
     // The client returns the body directly: { token: "..." } (handle both shapes just in case).
     try {
-      const res = await authClient.token();
-      const token = res?.token ?? res?.data?.token;
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+      const result = await authClient.token();
+const token = result?.token || result;
+
+if (token) {
+  config.headers.Authorization = `Bearer ${token}`;
+}
     } catch {
       // No active session; let the request proceed so the server can return 401 if required.
     }

@@ -2,7 +2,6 @@ import { betterAuth } from 'better-auth';
 import { mongodbAdapter } from 'better-auth/adapters/mongodb';
 import { jwt } from 'better-auth/plugins';
 import { MongoClient } from 'mongodb';
-import { SignJWT } from 'jose';
 
 const databaseUri = process.env.DB_URI;
 
@@ -16,22 +15,9 @@ const database = client.db();
 // Use the deployed client URL in production; default to the local dev origin.
 const baseURL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:5173';
 
-// Shared secret used by BOTH this client (to sign JWTs) and the REST API
-// server (to verify them). Must equal the server's JWT_SECRET.
-const jwtSecret = new TextEncoder().encode(
-  process.env.BETTER_AUTH_SECRET || process.env.JWT_SECRET
-);
-
-// Better Auth's jwt plugin signs with an asymmetric JWKS key by default, which
-// the Express server (jsonwebtoken.verify) cannot validate. Sign a standard
-// HS256 JWT instead so the backend can verify it with the shared secret.
-const signJwtHs256 = (payload) =>
-  new SignJWT(payload).setProtectedHeader({ alg: 'HS256' }).sign(jwtSecret);
-
 export const auth = betterAuth({
   baseURL,
-  // Must match the JWT_SECRET the external REST API uses to verify tokens.
-  secret: process.env.BETTER_AUTH_SECRET || process.env.JWT_SECRET,
+  secret: process.env.BETTER_AUTH_SECRET,
   trustedOrigins: [baseURL, 'http://localhost:5173'],
   database: mongodbAdapter(database, { client }),
   emailAndPassword: {
@@ -51,20 +37,7 @@ export const auth = betterAuth({
    }
   },
   plugins: [
-    jwt({
-      jwt: {
-        // Issue a standard HS256 JWT (verifiable by the REST API server's
-        // jsonwebtoken.verify(token, JWT_SECRET)) instead of the default
-        // asymmetric JWKS token the backend cannot verify.
-        sign: signJwtHs256,
-        expirationTime: '7d',
-      },
-      // Required by Better Auth when a custom `jwt.sign` is provided.
-      jwks: {
-        remoteUrl: `${baseURL}/api/auth/jwks`,
-        keyPairConfig: { alg: 'EdDSA' },
-      },
-    }),
+    jwt()
   ],
   user: {
     additionalFields: {
